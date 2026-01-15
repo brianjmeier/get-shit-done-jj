@@ -103,6 +103,12 @@ See [Architecture](#architecture) section for details.
 npx gsd-jj
 ```
 
+Or install directly from GitHub (if npm package unavailable):
+
+```bash
+npx github:brianjmeier/get-shit-done-jj
+```
+
 Choose your client (Claude Code or OpenCode) and installation location (global or local).
 
 **Global:** Installs to `~/.claude/` for all projects
