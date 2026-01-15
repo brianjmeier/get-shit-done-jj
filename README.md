@@ -1,353 +1,194 @@
 <div align="center">
 
-# GET SHIT DONE
+# GSD-JJ: Get Shit Done with Jujutsu
 
-**A light-weight and powerful meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.**
+**A powerful meta-prompting, context engineering and spec-driven development system for AI coding assistants — powered by Jujutsu VCS.**
 
-**Solves context rot — the quality degradation that happens as Claude fills its context window.**
+**Solves context rot with atomic commits and change-based workflows.**
 
-[![npm version](https://img.shields.io/npm/v/get-shit-done-cc?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-cc)
-[![npm downloads](https://img.shields.io/npm/dm/get-shit-done-cc?style=for-the-badge&logo=npm&logoColor=white&color=CB3837)](https://www.npmjs.com/package/get-shit-done-cc)
 [![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/glittercowboy/get-shit-done?style=for-the-badge&logo=github&color=181717)](https://github.com/glittercowboy/get-shit-done)
+[![JJ Integration](https://img.shields.io/badge/VCS-Jujutsu-orange?style=for-the-badge)](https://github.com/martinvonz/jj)
 
 <br>
 
 ```bash
-npx get-shit-done-cc
+npx gsd-jj
 ```
 
-**Works on Mac, Windows, and Linux.**
-
-<br>
-
-![GSD Install](assets/terminal.svg)
+**Interactive installer for Claude Code and OpenCode.**
 
 <br>
 
 *"If you know clearly what you want, this WILL build it for you. No bs."*
 
-*"I've done SpecKit, OpenSpec and Taskmaster — this has produced the best results for me."*
-
 *"By far the most powerful addition to my Claude Code. Nothing over-engineered. Literally just gets shit done."*
 
 <br>
 
-**Trusted by engineers at Amazon, Google, Shopify, and Webflow.**
-
-[Why I Built This](#why-i-built-this) · [How It Works](#how-it-works) · [Commands](#commands) · [Why It Works](#why-it-works)
+[Why JJ](#why-jj) · [Installation](#installation) · [Quick Start](#quick-start) · [Commands](#commands) · [Architecture](#architecture)
 
 </div>
 
 ---
 
-## Why I Built This
+## Overview
 
-I'm a solo developer. I don't write code — Claude Code does.
+GSD-JJ is a spec-driven development framework that enables AI coding assistants (like Claude Code) to build complex software reliably. It provides:
 
-Other spec-driven development tools exist; BMAD, Speckit... But they all seem to make things way more complicated than they need to be (sprint ceremonies, story points, stakeholder syncs, retrospectives, Jira workflows) or lack real big picture understanding of what you're building. I'm not a 50-person software company. I don't want to play enterprise theater. I'm just a creative person trying to build great things that work.
+- **Context Engineering** - Structured prompts that prevent quality degradation as context fills
+- **Atomic Commits** - Every task gets its own commit with JJ's change-based workflow
+- **Subagent Orchestration** - Fresh 200k token contexts for each task plan, zero degradation
+- **State Management** - Living memory across sessions via STATE.md and structured plans
 
-So I built GSD. The complexity is in the system, not in your workflow. Behind the scenes: context engineering, XML prompt formatting, subagent orchestration, state management. What you see: a few commands that just work.
-
-The system gives Claude everything it needs to do the work *and* verify it. I trust the workflow. It just does a good job.
-
-That's what this is. No enterprise roleplay bullshit. Just an incredibly effective system for building cool stuff consistently using Claude Code.
-
-— **TÂCHES**
+This is a Jujutsu-native fork of the original [Get Shit Done](https://github.com/glittercowboy/get-shit-done) framework, replacing Git with JJ for superior atomic commits and modern VCS workflows.
 
 ---
 
-Vibecoding has a bad reputation. You describe what you want, AI generates code, and you get inconsistent garbage that falls apart at scale.
+## Why JJ?
 
-GSD fixes that. It's the context engineering layer that makes Claude Code reliable. Describe your idea, let the system extract everything it needs to know, and let Claude Code get to work.
+Jujutsu (JJ) is a next-generation version control system that fundamentally improves AI-automated workflows:
 
----
+### Benefits Over Git
 
-## Who This Is For
+| Feature | Git | JJ |
+|---------|-----|-----|
+| **Atomic commits** | Manual staging with `git add` | Automatic tracking, instant commits |
+| **Commit identity** | SHA hashes change on rebase | Change IDs persist through rebases |
+| **Task isolation** | Complex branch management | Simple `jj new` for each task |
+| **Revert precision** | Revert by hash (breaks after rebase) | Revert by change ID (stable) |
+| **Workflow clarity** | `git add`, `git commit`, `git push` | `jj commit`, `jj git push` |
 
-People who want to describe what they want and have it built correctly — without pretending they're running a 50-person engineering org.
+### Why This Matters for AI Coding
 
----
+1. **No staging complexity** - JJ auto-tracks changes, eliminating `git add` steps
+2. **Stable references** - Change IDs survive rebases, making task commits truly atomic
+3. **Better observability** - `jj log` shows clean change history without merge noise
+4. **Surgical reverts** - Revert specific tasks by change ID, not by fragile hashes
 
-## Getting Started
+### GitHub Compatibility
 
-```bash
-npx get-shit-done-cc
-```
-
-That's it. Verify with `/gsd:help` inside your Claude Code interface.
-
-### Staying Updated
-
-GSD evolves fast. Check for updates periodically:
-
-```
-/gsd:whats-new
-```
-
-Update with:
-
-```bash
-npx get-shit-done-cc@latest
-```
-
-<details>
-<summary><strong>Non-interactive Install (Docker, CI, Scripts)</strong></summary>
-
-```bash
-npx get-shit-done-cc --global   # Install to ~/.claude/
-npx get-shit-done-cc --local    # Install to ./.claude/
-```
-
-Use `--global` (`-g`) or `--local` (`-l`) to skip the interactive prompt.
-
-</details>
-
-<details>
-<summary><strong>Development Installation</strong></summary>
-
-Clone the repository and run the installer locally:
-
-```bash
-git clone https://github.com/glittercowboy/get-shit-done.git
-cd get-shit-done
-node bin/install.js --local
-```
-
-Installs to `./.claude/` for testing modifications before contributing.
-
-</details>
-
-### Recommended: Skip Permissions Mode
-
-GSD is designed for frictionless automation. Run Claude Code with:
-
-```bash
-claude --dangerously-skip-permissions
-```
-
-> [!TIP]
-> This is how GSD is intended to be used — stopping to approve `date` and `git commit` 50 times defeats the purpose.
-
-<details>
-<summary><strong>Alternative: Granular Permissions</strong></summary>
-
-If you prefer not to use that flag, add this to your project's `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": [
-      "Bash(date:*)",
-      "Bash(echo:*)",
-      "Bash(cat:*)",
-      "Bash(ls:*)",
-      "Bash(mkdir:*)",
-      "Bash(wc:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(sort:*)",
-      "Bash(grep:*)",
-      "Bash(tr:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git status:*)",
-      "Bash(git log:*)",
-      "Bash(git diff:*)",
-      "Bash(git tag:*)"
-    ]
-  }
-}
-```
-
-</details>
+GSD-JJ uses **colocated repositories** (`.git` + `.jj`), which means:
+- Full GitHub/GitLab compatibility via `jj git push`/`jj git fetch`
+- Modern JJ workflow for local development
+- Standard Git remotes for collaboration
+- No migration required for existing projects
 
 ---
 
-## How It Works
+## Supported Clients
 
-### 1. Start with an idea
+GSD uses a **shared core + client adapters** architecture:
+
+- **Claude Code** (Primary) - Full feature support, actively maintained
+- **OpenCode** (Planned) - Adapter layer documented, implementation pending
+
+The shared core (workflows, references, templates) is client-agnostic. Client-specific logic lives in thin adapter layers.
+
+### Why This Architecture?
+
+- Same workflows and features across all clients
+- Bug fixes and improvements benefit everyone
+- Easy to add support for new AI coding assistants
+- No code duplication between clients
+
+See [Architecture](#architecture) section for details.
+
+---
+
+## Installation
+
+### Interactive Install (Recommended)
+
+```bash
+npx gsd-jj
+```
+
+Choose your client (Claude Code or OpenCode) and installation location (global or local).
+
+**Global:** Installs to `~/.claude/` for all projects
+**Local:** Installs to `./.claude/` for current project only
+
+### Non-Interactive Install
+
+For Docker, CI, or scripted installations:
+
+```bash
+# Claude Code - Global
+npx gsd-jj --claude-code --global
+
+# Claude Code - Local
+npx gsd-jj --claude-code --local
+
+# OpenCode - Global
+npx gsd-jj --opencode --global
+
+# OpenCode - Local
+npx gsd-jj --opencode --local
+```
+
+**Verify installation:**
+
+```
+/gsd:help
+```
+
+Inside Claude Code or OpenCode interface.
+
+### Development Installation
+
+To test modifications before contributing:
+
+```bash
+git clone https://github.com/glittercowboy/get-shit-done-jj.git
+cd get-shit-done-jj
+node bin/install.js --claude-code --local
+```
+
+Installs to `./.claude/` in the repo for testing.
+
+---
+
+## Quick Start
+
+### 1. Initialize Project
 
 ```
 /gsd:new-project
 ```
 
-The system asks questions. Keeps asking until it has everything — your goals, constraints, tech preferences, edge cases. You go back and forth until the idea is fully captured. Creates **PROJECT.md**.
+System asks questions until your idea is fully captured. Creates **PROJECT.md**.
 
-### 1.5. Research the domain (optional)
-
-```
-/gsd:research-project
-```
-
-Spawns parallel agents to investigate the domain — what's the standard stack, what features users expect, common architectural patterns, and pitfalls to avoid. Creates `.planning/research/` with ecosystem knowledge.
-
-> Recommended for best results. Skip only if you need speed over thoroughness.
-
-### 2. Define requirements
+### 2. Define Requirements
 
 ```
 /gsd:define-requirements
 ```
 
-Scope what's v1, what's v2, and what's out of scope. Creates **REQUIREMENTS.md** with checkable requirements and traceability. Works with or without prior research.
+Scope v1, v2, and out-of-scope features. Creates **REQUIREMENTS.md**.
 
-### 3. Create roadmap
+### 3. Create Roadmap
 
 ```
 /gsd:create-roadmap
 ```
 
-Produces:
-- **ROADMAP.md** — Phases from start to finish, mapped to requirements
-- **STATE.md** — Living memory that persists across sessions
+Generates **ROADMAP.md** with phases mapped to requirements, plus **STATE.md** for session memory.
 
-### 4. Plan and execute phases
+### 4. Execute Phases
 
 ```
-/gsd:plan-phase 1      # System creates atomic task plans
-/gsd:execute-phase 1   # Parallel agents execute all plans
+/gsd:plan-phase 1      # Generate task plans
+/gsd:execute-phase 1   # Run all plans in parallel
 ```
 
-Each phase breaks into 2-3 task plans. Each plan runs in a fresh subagent context — 200k tokens purely for implementation, zero degradation. Plans without dependencies run in parallel.
+Each phase breaks into 2-3 autonomous task plans. Plans run in fresh subagent contexts (200k tokens each) with zero degradation.
 
-**For single-plan or interactive execution:**
-```
-/gsd:execute-plan      # Run one plan at a time with checkpoints
-```
-
-Use `/gsd:execute-phase` for parallel "walk away" automation (recommended). Use `/gsd:execute-plan` when you need interactive single-plan execution with manual checkpoints.
-
-### 5. Ship and iterate
+### 5. Verify and Ship
 
 ```
-/gsd:complete-milestone   # Archive v1, prep for v2
-/gsd:add-phase            # Append new work
-/gsd:insert-phase 2       # Slip urgent work between phases
+/gsd:verify-work 1            # Test the phase
+/gsd:complete-milestone v1.0  # Ship it
 ```
-
-Ship your MVP in a day. Add features. Insert hotfixes. The system stays modular — you're never stuck.
-
----
-
-## Existing Projects (Brownfield)
-
-Already have code? Start here instead.
-
-### 1. Map the codebase
-
-```
-/gsd:map-codebase
-```
-
-Spawns parallel agents to analyze your code. Creates `.planning/codebase/` with 7 documents:
-
-| Document | Purpose |
-|----------|---------|
-| `STACK.md` | Languages, frameworks, dependencies |
-| `ARCHITECTURE.md` | Patterns, layers, data flow |
-| `STRUCTURE.md` | Directory layout, where things live |
-| `CONVENTIONS.md` | Code style, naming patterns |
-| `TESTING.md` | Test framework, patterns |
-| `INTEGRATIONS.md` | External services, APIs |
-| `CONCERNS.md` | Tech debt, known issues, fragile areas |
-
-### 2. Initialize project
-
-```
-/gsd:new-project
-```
-
-Same as greenfield, but the system knows your codebase. Questions focus on what you're adding/changing, not starting from scratch.
-
-### 3. Continue as normal
-
-From here, it's the same flow:
-- `/gsd:research-project` (optional) → `/gsd:define-requirements` → `/gsd:create-roadmap` → `/gsd:plan-phase` → `/gsd:execute-phase`
-
-The codebase docs load automatically during planning. Claude knows your patterns, conventions, and where to put things.
-
----
-
-## Why It Works
-
-### Context Engineering
-
-Claude Code is incredibly powerful *if* you give it the context it needs. Most people don't.
-
-GSD handles it for you:
-
-| File | What it does |
-|------|--------------|
-| `PROJECT.md` | Project vision, always loaded |
-| `research/` | Ecosystem knowledge (stack, features, architecture, pitfalls) |
-| `REQUIREMENTS.md` | Scoped v1/v2 requirements with phase traceability |
-| `ROADMAP.md` | Where you're going, what's done |
-| `STATE.md` | Decisions, blockers, position — memory across sessions |
-| `PLAN.md` | Atomic task with XML structure, verification steps |
-| `SUMMARY.md` | What happened, what changed, committed to history |
-| `todos/` | Captured ideas and tasks for later work |
-
-Size limits based on where Claude's quality degrades. Stay under, get consistent excellence.
-
-### XML Prompt Formatting
-
-Every plan is structured XML optimized for Claude:
-
-```xml
-<task type="auto">
-  <name>Create login endpoint</name>
-  <files>src/app/api/auth/login/route.ts</files>
-  <action>
-    Use jose for JWT (not jsonwebtoken - CommonJS issues).
-    Validate credentials against users table.
-    Return httpOnly cookie on success.
-  </action>
-  <verify>curl -X POST localhost:3000/api/auth/login returns 200 + Set-Cookie</verify>
-  <done>Valid credentials return cookie, invalid return 401</done>
-</task>
-```
-
-Precise instructions. No guessing. Verification built in.
-
-### Subagent Execution
-
-As Claude fills its context window, quality degrades. You've seen it: *"Due to context limits, I'll be more concise now."* That "concision" is code for cutting corners.
-
-GSD prevents this. Each plan is maximum 3 tasks. Each plan runs in a fresh subagent — 200k tokens purely for implementation, zero accumulated garbage.
-
-| Task | Context | Quality |
-|------|---------|---------|
-| Task 1 | Fresh | ✅ Full |
-| Task 2 | Fresh | ✅ Full |
-| Task 3 | Fresh | ✅ Full |
-
-No degradation. Walk away, come back to completed work.
-
-### Atomic Git Commits
-
-Each task gets its own commit immediately after completion:
-
-```bash
-abc123f docs(08-02): complete user registration plan
-def456g feat(08-02): add email confirmation flow
-hij789k feat(08-02): implement password hashing
-lmn012o feat(08-02): create registration endpoint
-```
-
-> [!NOTE]
-> **Benefits:** Git bisect finds exact failing task. Each task independently revertable. Clear history for Claude in future sessions. Better observability in AI-automated workflow.
-
-Every commit is surgical, traceable, and meaningful.
-
-### Modular by Design
-
-- Add phases to current milestone
-- Insert urgent work between phases
-- Complete milestones and start fresh
-- Adjust plans without rebuilding everything
-
-You're never locked in. The system adapts.
 
 ---
 
@@ -358,9 +199,9 @@ You're never locked in. The system adapts.
 | Command | What it does |
 |---------|--------------|
 | `/gsd:new-project` | Extract your idea through questions, create PROJECT.md |
-| `/gsd:research-project` | Research domain ecosystem (stacks, features, pitfalls) |
+| `/gsd:research-project` | Research domain ecosystem (optional but recommended) |
 | `/gsd:define-requirements` | Scope v1/v2/out-of-scope requirements |
-| `/gsd:create-roadmap` | Create roadmap with phases mapped to requirements |
+| `/gsd:create-roadmap` | Create roadmap with phases |
 | `/gsd:map-codebase` | Map existing codebase for brownfield projects |
 
 ### Execution
@@ -368,52 +209,203 @@ You're never locked in. The system adapts.
 | Command | What it does |
 |---------|--------------|
 | `/gsd:plan-phase [N]` | Generate task plans for phase |
-| `/gsd:execute-phase <N>` | Execute all plans in phase with parallel agents |
-| `/gsd:execute-plan` | Run single plan via subagent |
-| `/gsd:progress` | Where am I? What's next? |
+| `/gsd:execute-phase <N>` | Execute all plans in phase (parallel) |
+| `/gsd:execute-plan` | Run single plan (interactive) |
+| `/gsd:progress` | Check current position and next steps |
 
 ### Verification
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:verify-work [N]` | User acceptance test of phase or plan ¹ |
-
-### Milestones
-
-| Command | What it does |
-|---------|--------------|
-| `/gsd:complete-milestone` | Ship it, prep next version |
-| `/gsd:discuss-milestone` | Gather context for next milestone |
-| `/gsd:new-milestone [name]` | Create new milestone with phases |
+| `/gsd:verify-work [N]` | User acceptance test of phase |
+| `/gsd:plan-fix [plan]` | Plan fixes for UAT issues |
 
 ### Phase Management
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:add-phase` | Append phase to roadmap |
+| `/gsd:add-phase` | Append phase to current roadmap |
 | `/gsd:insert-phase [N]` | Insert urgent work between phases |
-| `/gsd:remove-phase [N]` | Remove future phase, renumber subsequent |
+| `/gsd:remove-phase [N]` | Remove future phase, renumber rest |
 | `/gsd:discuss-phase [N]` | Gather context before planning |
 | `/gsd:research-phase [N]` | Deep research for unfamiliar domains |
-| `/gsd:list-phase-assumptions [N]` | See what Claude assumes before correcting |
 
-### Session
+### Milestones
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:pause-work` | Create handoff file when stopping mid-phase |
+| `/gsd:complete-milestone` | Archive current milestone, prep next |
+| `/gsd:discuss-milestone` | Gather context for next milestone |
+| `/gsd:new-milestone [name]` | Create new milestone with phases |
+
+### Session Management
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:pause-work` | Create handoff when stopping mid-phase |
 | `/gsd:resume-work` | Restore from last session |
 
 ### Utilities
 
 | Command | What it does |
 |---------|--------------|
-| `/gsd:add-todo [desc]` | Capture idea or task for later |
-| `/gsd:check-todos [area]` | List pending todos, select one to work on |
-| `/gsd:debug [desc]` | Systematic debugging with persistent state |
-| `/gsd:help` | Show all commands and usage guide |
+| `/gsd:add-todo [desc]` | Capture idea for later |
+| `/gsd:check-todos [area]` | List pending todos, select one |
+| `/gsd:debug [desc]` | Systematic debugging with state |
+| `/gsd:help` | Show all commands |
+| `/gsd:whats-new` | See latest updates |
 
-<sup>¹ Contributed by reddit user OracleGreyBeard</sup>
+---
+
+## How It Works
+
+### Context Engineering
+
+Claude Code is powerful when given proper context. GSD provides it:
+
+| File | Purpose |
+|------|---------|
+| `PROJECT.md` | Project vision, always loaded |
+| `research/` | Ecosystem knowledge (optional) |
+| `REQUIREMENTS.md` | Scoped requirements with traceability |
+| `ROADMAP.md` | Phase structure and progress |
+| `STATE.md` | Decisions, blockers, session memory |
+| `PLAN.md` | Atomic task with XML structure |
+| `SUMMARY.md` | Execution results, committed to history |
+
+Size limits based on where Claude's quality degrades. Stay under, get consistent excellence.
+
+### XML Prompt Formatting
+
+Every plan uses structured XML optimized for Claude:
+
+```xml
+<task type="auto">
+  <name>Create login endpoint</name>
+  <files>src/app/api/auth/login/route.ts</files>
+  <action>
+    Use jose for JWT. Validate against users table.
+    Return httpOnly cookie on success.
+  </action>
+  <verify>curl -X POST localhost:3000/api/auth/login returns 200</verify>
+  <done>Valid credentials return cookie, invalid return 401</done>
+</task>
+```
+
+Precise instructions. No guessing. Verification built in.
+
+### Subagent Execution
+
+As Claude fills context, quality degrades. GSD prevents this:
+
+- Each phase: 2-3 task plans maximum
+- Each plan: Fresh subagent with 200k tokens
+- Each task: Atomic commit immediately after completion
+
+**Result:** Zero degradation. Walk away, come back to completed work.
+
+### Atomic Commits with JJ
+
+Every task gets its own commit:
+
+```bash
+jj log
+○  yqvq docs(03-04): complete adapter documentation
+│
+○  rtxv feat(03-03): add installer improvements
+│
+○  mnop feat(03-02): update opencode adapter
+│
+○  klmn feat(03-01): verify shared core
+```
+
+Benefits:
+- Change IDs persist through rebases (more stable than Git hashes)
+- Each task independently revertable with `jj revert`
+- Clear history with `jj log`
+- Surgical precision in AI-automated workflow
+
+---
+
+## Architecture
+
+GSD uses a **shared core + client adapters** pattern:
+
+```
+┌─────────────────────────────────────────┐
+│         Shared Core (Client-Agnostic)   │
+│                                          │
+│  • Workflows (execute-plan, plan-phase) │
+│  • References (checkpoints, tdd)        │
+│  • Templates (PLAN, SUMMARY, ROADMAP)   │
+│                                          │
+│  Location: get-shit-done/               │
+└─────────────────┬───────────────────────┘
+                  │
+        ┌─────────┴─────────┐
+        │                   │
+┌───────▼──────┐    ┌──────▼────────┐
+│ Claude Code  │    │   OpenCode    │
+│   Adapter    │    │    Adapter    │
+│              │    │               │
+│ commands/    │    │ adapters/     │
+│ gsd/*.md     │    │ opencode/     │
+└──────────────┘    └───────────────┘
+```
+
+### Design Principles
+
+1. **Thin adapters, rich core** - Adapters parse arguments and resolve paths, core handles workflows
+2. **Client-agnostic core** - No hardcoded paths, no client-specific logic
+3. **Runtime path resolution** - `@~/.claude/` pattern resolved by each client
+4. **Single source of truth** - Bug fixes and features benefit all clients
+
+For detailed architecture documentation, see [get-shit-done/references/adapter-architecture.md](get-shit-done/references/adapter-architecture.md).
+
+---
+
+## Recommended: Skip Permissions Mode
+
+GSD is designed for frictionless automation. Run Claude Code with:
+
+```bash
+claude --dangerously-skip-permissions
+```
+
+Stopping to approve `date` and `jj commit` 50 times defeats the purpose.
+
+<details>
+<summary><strong>Alternative: Granular Permissions</strong></summary>
+
+Add to `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(date:*)",
+      "Bash(jj:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}
+```
+
+</details>
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+
+Key points:
+- Shared core must remain client-agnostic
+- Changes to workflows affect both Claude Code and OpenCode
+- Test both clients before submitting PRs
+- Use JJ for commits (`jj commit` instead of `git commit`)
 
 ---
 
@@ -421,36 +413,17 @@ You're never locked in. The system adapts.
 
 **Commands not found after install?**
 - Restart Claude Code to reload slash commands
-- Verify files exist in `~/.claude/commands/gsd/` (global) or `./.claude/commands/gsd/` (local)
+- Verify files in `~/.claude/commands/gsd/` (global) or `./.claude/commands/gsd/` (local)
 
-**Commands not working as expected?**
-- Run `/gsd:help` to verify installation
-- Re-run `npx get-shit-done-cc` to reinstall
-
-**Updating to the latest version?**
+**Want to update?**
 ```bash
-npx get-shit-done-cc@latest
+npx gsd-jj@latest
 ```
 
-**Using Docker or containerized environments?**
-
-If file reads fail with tilde paths (`~/.claude/...`), set `CLAUDE_CONFIG_DIR` before installing:
+**Using Docker or containers?**
 ```bash
-CLAUDE_CONFIG_DIR=/home/youruser/.claude npx get-shit-done-cc --global
+CLAUDE_CONFIG_DIR=/home/user/.claude npx gsd-jj --claude-code --global
 ```
-This ensures absolute paths are used instead of `~` which may not expand correctly in containers.
-
----
-
-## Star History
-
-<a href="https://star-history.com/#glittercowboy/get-shit-done&Date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=glittercowboy/get-shit-done&type=Date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=glittercowboy/get-shit-done&type=Date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=glittercowboy/get-shit-done&type=Date" />
- </picture>
-</a>
 
 ---
 
@@ -462,6 +435,8 @@ MIT License. See [LICENSE](LICENSE) for details.
 
 <div align="center">
 
-**Claude Code is powerful. GSD makes it reliable.**
+**AI coding is powerful. GSD-JJ makes it reliable.**
+
+Built with ❤️ by the Get Shit Done community
 
 </div>

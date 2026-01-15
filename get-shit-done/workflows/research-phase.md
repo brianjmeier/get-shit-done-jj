@@ -399,12 +399,11 @@ What's next?
 ```
 </step>
 
-<step name="git_commit">
+<step name="jj_commit">
 Commit phase research:
 
 ```bash
-git add .planning/phases/${PHASE}-${SLUG}/${PHASE}-RESEARCH.md
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs(${PHASE}): complete phase research
 
 Phase ${PHASE}: ${PHASE_NAME}

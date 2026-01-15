@@ -1,3 +1,13 @@
+# DEPRECATED - Use jj-integration.md
+
+> **This file is deprecated.** GSD-JJ uses Jujutsu (JJ) instead of Git.
+>
+> See: `get-shit-done/references/jj-integration.md` for all VCS operations.
+>
+> This file is kept for reference only. Do not use these patterns.
+
+---
+
 <overview>
 Git integration for GSD framework.
 </overview>

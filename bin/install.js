@@ -1,232 +1,231 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const readline = require('readline');
+import { promises as fs } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import readline from 'readline';
+import os from 'os';
 
-// Colors
-const cyan = '\x1b[36m';
-const green = '\x1b[32m';
-const yellow = '\x1b[33m';
-const dim = '\x1b[2m';
-const reset = '\x1b[0m';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const projectRoot = path.resolve(__dirname, '..');
 
-// Get version from package.json
-const pkg = require('../package.json');
+// ANSI color codes for terminal output
+const colors = {
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  green: '\x1b[32m',
+  blue: '\x1b[34m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  cyan: '\x1b[36m',
+  dim: '\x1b[2m',
+};
 
-const banner = `
-${cyan}   ██████╗ ███████╗██████╗
-  ██╔════╝ ██╔════╝██╔══██╗
-  ██║  ███╗███████╗██║  ██║
-  ██║   ██║╚════██║██║  ██║
-  ╚██████╔╝███████║██████╔╝
-   ╚═════╝ ╚══════╝╚═════╝${reset}
-
-  Get Shit Done ${dim}v${pkg.version}${reset}
-  A meta-prompting, context engineering and spec-driven
-  development system for Claude Code by TÂCHES.
-`;
-
-// Parse args
-const args = process.argv.slice(2);
-const hasGlobal = args.includes('--global') || args.includes('-g');
-const hasLocal = args.includes('--local') || args.includes('-l');
-
-// Parse --config-dir argument
-function parseConfigDirArg() {
-  const configDirIndex = args.findIndex(arg => arg === '--config-dir' || arg === '-c');
-  if (configDirIndex !== -1) {
-    const nextArg = args[configDirIndex + 1];
-    // Error if --config-dir is provided without a value or next arg is another flag
-    if (!nextArg || nextArg.startsWith('-')) {
-      console.error(`  ${yellow}--config-dir requires a path argument${reset}`);
-      process.exit(1);
-    }
-    return nextArg;
-  }
-  // Also handle --config-dir=value format
-  const configDirArg = args.find(arg => arg.startsWith('--config-dir=') || arg.startsWith('-c='));
-  if (configDirArg) {
-    return configDirArg.split('=')[1];
-  }
-  return null;
-}
-const explicitConfigDir = parseConfigDirArg();
-const hasHelp = args.includes('--help') || args.includes('-h');
-
-console.log(banner);
-
-// Show help if requested
-if (hasHelp) {
-  console.log(`  ${yellow}Usage:${reset} npx get-shit-done-cc [options]
-
-  ${yellow}Options:${reset}
-    ${cyan}-g, --global${reset}              Install globally (to Claude config directory)
-    ${cyan}-l, --local${reset}               Install locally (to ./.claude in current directory)
-    ${cyan}-c, --config-dir <path>${reset}   Specify custom Claude config directory
-    ${cyan}-h, --help${reset}                Show this help message
-
-  ${yellow}Examples:${reset}
-    ${dim}# Install to default ~/.claude directory${reset}
-    npx get-shit-done-cc --global
-
-    ${dim}# Install to custom config directory (for multiple Claude accounts)${reset}
-    npx get-shit-done-cc --global --config-dir ~/.claude-bc
-
-    ${dim}# Using environment variable${reset}
-    CLAUDE_CONFIG_DIR=~/.claude-bc npx get-shit-done-cc --global
-
-    ${dim}# Install to current project only${reset}
-    npx get-shit-done-cc --local
-
-  ${yellow}Notes:${reset}
-    The --config-dir option is useful when you have multiple Claude Code
-    configurations (e.g., for different subscriptions). It takes priority
-    over the CLAUDE_CONFIG_DIR environment variable.
-`);
-  process.exit(0);
+function log(message, color = '') {
+  console.log(`${color}${message}${colors.reset}`);
 }
 
-/**
- * Expand ~ to home directory (shell doesn't expand in env vars passed to node)
- */
-function expandTilde(filePath) {
-  if (filePath && filePath.startsWith('~/')) {
-    return path.join(os.homedir(), filePath.slice(2));
-  }
-  return filePath;
-}
+function parseArgs() {
+  const args = process.argv.slice(2);
+  const options = {
+    client: null, // 'claude-code' | 'opencode' | null (interactive)
+    scope: 'global', // 'global' | 'local'
+    help: false,
+  };
 
-/**
- * Recursively copy directory, replacing paths in .md files
- */
-function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
-  fs.mkdirSync(destDir, { recursive: true });
-
-  const entries = fs.readdirSync(srcDir, { withFileTypes: true });
-
-  for (const entry of entries) {
-    const srcPath = path.join(srcDir, entry.name);
-    const destPath = path.join(destDir, entry.name);
-
-    if (entry.isDirectory()) {
-      copyWithPathReplacement(srcPath, destPath, pathPrefix);
-    } else if (entry.name.endsWith('.md')) {
-      // Replace ~/.claude/ with the appropriate prefix in markdown files
-      let content = fs.readFileSync(srcPath, 'utf8');
-      content = content.replace(/~\/\.claude\//g, pathPrefix);
-      fs.writeFileSync(destPath, content);
-    } else {
-      fs.copyFileSync(srcPath, destPath);
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    switch (arg) {
+      case '--claude-code':
+      case '-c':
+        options.client = 'claude-code';
+        break;
+      case '--opencode':
+      case '-o':
+        options.client = 'opencode';
+        break;
+      case '--global':
+      case '-g':
+        options.scope = 'global';
+        break;
+      case '--local':
+      case '-l':
+        options.scope = 'local';
+        break;
+      case '--help':
+      case '-h':
+        options.help = true;
+        break;
+      default:
+        log(`Unknown option: ${arg}`, colors.red);
+        options.help = true;
     }
   }
+
+  return options;
 }
 
-/**
- * Install to the specified directory
- */
-function install(isGlobal) {
-  const src = path.join(__dirname, '..');
-  // Priority: explicit --config-dir arg > CLAUDE_CONFIG_DIR env var > default ~/.claude
-  const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.CLAUDE_CONFIG_DIR);
-  const defaultGlobalDir = configDir || path.join(os.homedir(), '.claude');
-  const claudeDir = isGlobal
-    ? defaultGlobalDir
-    : path.join(process.cwd(), '.claude');
-
-  const locationLabel = isGlobal
-    ? claudeDir.replace(os.homedir(), '~')
-    : claudeDir.replace(process.cwd(), '.');
-
-  // Path prefix for file references
-  // Use actual path when CLAUDE_CONFIG_DIR is set, otherwise use ~ shorthand
-  const pathPrefix = isGlobal
-    ? (configDir ? `${claudeDir}/` : '~/.claude/')
-    : './.claude/';
-
-  console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
-
-  // Create commands directory
-  const commandsDir = path.join(claudeDir, 'commands');
-  fs.mkdirSync(commandsDir, { recursive: true });
-
-  // Copy commands/gsd with path replacement
-  const gsdSrc = path.join(src, 'commands', 'gsd');
-  const gsdDest = path.join(commandsDir, 'gsd');
-  copyWithPathReplacement(gsdSrc, gsdDest, pathPrefix);
-  console.log(`  ${green}✓${reset} Installed commands/gsd`);
-
-  // Copy get-shit-done skill with path replacement
-  const skillSrc = path.join(src, 'get-shit-done');
-  const skillDest = path.join(claudeDir, 'get-shit-done');
-  copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
-  console.log(`  ${green}✓${reset} Installed get-shit-done`);
-
-  // Copy agents to ~/.claude/agents (subagents must be at root level)
-  const agentsSrc = path.join(src, 'agents');
-  if (fs.existsSync(agentsSrc)) {
-    const agentsDest = path.join(claudeDir, 'agents');
-    copyWithPathReplacement(agentsSrc, agentsDest, pathPrefix);
-    console.log(`  ${green}✓${reset} Installed agents`);
-  }
-
-  // Copy CHANGELOG.md
-  const changelogSrc = path.join(src, 'CHANGELOG.md');
-  const changelogDest = path.join(claudeDir, 'get-shit-done', 'CHANGELOG.md');
-  if (fs.existsSync(changelogSrc)) {
-    fs.copyFileSync(changelogSrc, changelogDest);
-    console.log(`  ${green}✓${reset} Installed CHANGELOG.md`);
-  }
-
-  // Write VERSION file for whats-new command
-  const versionDest = path.join(claudeDir, 'get-shit-done', 'VERSION');
-  fs.writeFileSync(versionDest, pkg.version);
-  console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
-
-  console.log(`
-  ${green}Done!${reset} Launch Claude Code and run ${cyan}/gsd:help${reset}.
-`);
+function showHelp() {
+  log('\nGSD-JJ Installer', colors.bright + colors.blue);
+  log('================\n', colors.blue);
+  log('Install GSD (Get Shit Done) context engineering framework with JJ (Jujutsu) VCS\n');
+  log('Usage:', colors.bright);
+  log('  npx gsd-jj [options]\n');
+  log('Options:', colors.bright);
+  log('  -c, --claude-code    Force Claude Code installation');
+  log('  -o, --opencode       Force OpenCode installation');
+  log('  -g, --global         Install globally (default)');
+  log('  -l, --local          Install to current project (.claude/ or .opencode/)');
+  log('  -h, --help           Show this help message\n');
+  log('Examples:', colors.bright);
+  log('  npx gsd-jj                  # Interactive prompt to select client');
+  log('  npx gsd-jj --claude-code    # Install for Claude Code to ~/.claude/');
+  log('  npx gsd-jj --opencode       # Install for OpenCode to ~/.config/opencode/');
+  log('  npx gsd-jj -o --local       # Install for OpenCode to ./.opencode/\n');
 }
 
-/**
- * Prompt for install location
- */
-function promptLocation() {
+async function prompt(question) {
   const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
-  const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.CLAUDE_CONFIG_DIR);
-  const globalPath = configDir || path.join(os.homedir(), '.claude');
-  const globalLabel = globalPath.replace(os.homedir(), '~');
-
-  console.log(`  ${yellow}Where would you like to install?${reset}
-
-  ${cyan}1${reset}) Global ${dim}(${globalLabel})${reset} - available in all projects
-  ${cyan}2${reset}) Local  ${dim}(./.claude)${reset} - this project only
-`);
-
-  rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
-    rl.close();
-    const choice = answer.trim() || '1';
-    const isGlobal = choice !== '2';
-    install(isGlobal);
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      rl.close();
+      resolve(answer.trim());
+    });
   });
 }
 
-// Main
-if (hasGlobal && hasLocal) {
-  console.error(`  ${yellow}Cannot specify both --global and --local${reset}`);
-  process.exit(1);
-} else if (explicitConfigDir && hasLocal) {
-  console.error(`  ${yellow}Cannot use --config-dir with --local${reset}`);
-  process.exit(1);
-} else if (hasGlobal) {
-  install(true);
-} else if (hasLocal) {
-  install(false);
-} else {
-  promptLocation();
+async function selectClient() {
+  log('\nSelect client:', colors.bright);
+  log('1. Claude Code');
+  log('2. OpenCode\n');
+
+  const answer = await prompt('Enter choice (1 or 2): ');
+
+  if (answer === '1') return 'claude-code';
+  if (answer === '2') return 'opencode';
+
+  log('Invalid choice. Defaulting to Claude Code.', colors.yellow);
+  return 'claude-code';
 }
+
+function getTargetPath(client, scope) {
+  const home = os.homedir();
+
+  if (scope === 'global') {
+    if (client === 'claude-code') {
+      return path.join(home, '.claude');
+    } else {
+      return path.join(home, '.config', 'opencode');
+    }
+  } else {
+    // local
+    return client === 'claude-code' ? '.claude' : '.opencode';
+  }
+}
+
+async function copyDirectory(src, dest) {
+  await fs.mkdir(dest, { recursive: true });
+  const entries = await fs.readdir(src, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const srcPath = path.join(src, entry.name);
+    const destPath = path.join(dest, entry.name);
+
+    if (entry.isDirectory()) {
+      await copyDirectory(srcPath, destPath);
+    } else {
+      await fs.copyFile(srcPath, destPath);
+    }
+  }
+}
+
+async function install(client, scope) {
+  const targetPath = getTargetPath(client, scope);
+  const absoluteTargetPath = path.isAbsolute(targetPath)
+    ? targetPath
+    : path.resolve(process.cwd(), targetPath);
+
+  log(`\nInstalling GSD-JJ for ${client} (${scope})...`, colors.bright);
+  log(`Target: ${absoluteTargetPath}\n`, colors.blue);
+
+  try {
+    // 1. Copy shared core (get-shit-done/)
+    const coreSource = path.join(projectRoot, 'get-shit-done');
+    const coreTarget = path.join(absoluteTargetPath, 'get-shit-done');
+
+    log('→ Copying shared core...', colors.blue);
+    await copyDirectory(coreSource, coreTarget);
+    log('  ✓ Shared core installed', colors.green);
+
+    // 2. Copy client-specific commands
+    let commandsSource;
+    if (client === 'claude-code') {
+      commandsSource = path.join(projectRoot, 'commands', 'gsd');
+    } else {
+      commandsSource = path.join(projectRoot, 'adapters', 'opencode', 'command', 'gsd');
+    }
+
+    const commandsTarget = path.join(absoluteTargetPath, 'commands', 'gsd');
+
+    log('→ Copying client-specific commands...', colors.blue);
+    await copyDirectory(commandsSource, commandsTarget);
+    log('  ✓ Commands installed', colors.green);
+
+    // Success message
+    log('\n' + '='.repeat(60), colors.green);
+    log('Installation complete!', colors.bright + colors.green);
+    log('='.repeat(60) + '\n', colors.green);
+
+    log('Usage instructions:', colors.bright);
+    if (client === 'claude-code') {
+      log('  In Claude Code, type: /gsd:help');
+      log('  To start a new project: /gsd:new-project');
+      log('  To check progress: /gsd:progress\n');
+    } else {
+      log('  In OpenCode, type: /gsd:help');
+      log('  To start a new project: /gsd:new-project');
+      log('  To check progress: /gsd:progress\n');
+    }
+
+    log(`Installation path: ${absoluteTargetPath}`, colors.blue);
+    log(`Installed for: ${client}`, colors.blue);
+    log(`Scope: ${scope}\n`, colors.blue);
+  } catch (error) {
+    log('\nInstallation failed:', colors.red);
+    log(error.message, colors.red);
+    process.exit(1);
+  }
+}
+
+async function main() {
+  const options = parseArgs();
+
+  if (options.help) {
+    showHelp();
+    process.exit(0);
+  }
+
+  log('\n' + '='.repeat(60), colors.blue);
+  log('GSD-JJ Installer', colors.bright + colors.blue);
+  log('='.repeat(60) + '\n', colors.blue);
+
+  // Select client if not specified
+  let client = options.client;
+  if (!client) {
+    client = await selectClient();
+  }
+
+  // Install
+  await install(client, options.scope);
+}
+
+main().catch((error) => {
+  log('\nUnexpected error:', colors.red);
+  log(error.message, colors.red);
+  process.exit(1);
+});

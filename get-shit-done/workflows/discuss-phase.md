@@ -205,12 +205,11 @@ Created: .planning/phases/${PHASE}-${SLUG}/${PHASE}-CONTEXT.md
 
 </step>
 
-<step name="git_commit">
+<step name="jj_commit">
 Commit phase context:
 
 ```bash
-git add .planning/phases/${PHASE}-${SLUG}/${PHASE}-CONTEXT.md
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs(${PHASE}): capture phase context
 
 Phase ${PHASE}: ${PHASE_NAME}

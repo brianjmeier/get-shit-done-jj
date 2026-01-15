@@ -174,14 +174,11 @@ ls .planning/todos/pending/*.md 2>/dev/null | wc -l
 Update STATE.md "### Pending Todos" section if exists.
 </step>
 
-<step name="git_commit">
+<step name="jj_commit">
 If todo was moved to done/, commit the change:
 
 ```bash
-git add .planning/todos/done/[filename]
-git rm --cached .planning/todos/pending/[filename] 2>/dev/null || true
-[ -f .planning/STATE.md ] && git add .planning/STATE.md
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs: start work on todo - [title]
 
 Moved to done/, beginning implementation.
@@ -213,5 +210,5 @@ Confirm: "Committed: docs: start work on todo - [title]"
 - [ ] Appropriate actions offered
 - [ ] Selected action executed
 - [ ] STATE.md updated if todo count changed
-- [ ] Changes committed to git (if todo moved to done/)
+- [ ] Changes committed to JJ (if todo moved to done/)
 </success_criteria>

@@ -1,5 +1,5 @@
 <purpose>
-Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /clear, and feeds gaps into /gsd:plan-phase --gaps.
+Validate built features through conversational testing with persistent state. Creates UAT.md that tracks test progress, survives /clear, and feeds into /gsd:plan-fix.
 
 User tests, Claude records. One test at a time. Plain text responses.
 </purpose>
@@ -153,7 +153,7 @@ issues: 0
 pending: [N]
 skipped: 0
 
-## Gaps
+## Issues for /gsd:plan-fix
 
 [none yet]
 ```
@@ -224,15 +224,9 @@ reported: "{verbatim user response}"
 severity: {inferred}
 ```
 
-Append to Gaps section (structured YAML for plan-phase --gaps):
-```yaml
-- truth: "{expected behavior from test}"
-  status: failed
-  reason: "User reported: {verbatim user response}"
-  severity: {inferred}
-  test: {N}
-  artifacts: []  # Filled by diagnosis
-  missing: []    # Filled by diagnosis
+Append to Issues section:
+```
+- UAT-{NNN}: {brief summary from response} ({severity}) - Test {N}
 ```
 
 **After any response:**
@@ -280,8 +274,7 @@ Clear Current Test section:
 
 Commit the UAT file:
 ```bash
-git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
+jj commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
 ```
 
 Present summary:
@@ -327,12 +320,12 @@ Spawning parallel debug agents to investigate each issue.
 - Spawn parallel debug agents for each issue
 - Collect root causes
 - Update UAT.md with root causes
-- Proceed to `offer_gap_closure`
+- Proceed to `offer_plan_fix`
 
 Diagnosis runs automatically - no user prompt. Parallel agents investigate simultaneously, so overhead is minimal and fixes are more accurate.
 </step>
 
-<step name="offer_gap_closure">
+<step name="offer_plan_fix">
 **Offer next steps after diagnosis:**
 
 ```
@@ -340,14 +333,14 @@ Diagnosis runs automatically - no user prompt. Parallel agents investigate simul
 
 ## Diagnosis Complete
 
-| Gap | Root Cause |
-|-----|------------|
-| {truth 1} | {root_cause} |
-| {truth 2} | {root_cause} |
+| Issue | Root Cause |
+|-------|------------|
+| UAT-001 | {root_cause} |
+| UAT-002 | {root_cause} |
 ...
 
 Next steps:
-- `/gsd:plan-phase {phase} --gaps` — Create fix plans from diagnosed gaps
+- `/gsd:plan-fix {phase}` — Create fix plan with root causes
 - `/gsd:verify-work {phase}` — Re-test after fixes
 ```
 </step>
@@ -355,23 +348,18 @@ Next steps:
 </process>
 
 <update_rules>
-**Batched writes for efficiency:**
+**Section update rules:**
 
-Keep results in memory. Write to file only when:
-1. **Issue found** — Preserve the problem immediately
-2. **Session complete** — Final write before commit
-3. **Checkpoint** — Every 5 passed tests (safety net)
-
-| Section | Rule | When Written |
-|---------|------|--------------|
+| Section | Rule | When |
+|---------|------|------|
 | Frontmatter.status | OVERWRITE | Start, complete |
-| Frontmatter.updated | OVERWRITE | On any file write |
-| Current Test | OVERWRITE | On any file write |
-| Tests.{N}.result | OVERWRITE | On any file write |
-| Summary | OVERWRITE | On any file write |
-| Gaps | APPEND | When issue found |
+| Frontmatter.updated | OVERWRITE | Every update |
+| Current Test | OVERWRITE | Each test transition |
+| Tests.{N}.result | OVERWRITE | When user responds |
+| Summary | OVERWRITE | After each response |
+| Issues | APPEND | When issue found |
 
-On context reset: File shows last checkpoint. Resume from there.
+**Update file AFTER processing each response.** If context resets, file shows exactly where to resume.
 </update_rules>
 
 <severity_inference>
@@ -394,7 +382,8 @@ Default to **major** if unclear. User can correct if needed.
 - [ ] Tests presented one at a time with expected behavior
 - [ ] User responses processed as pass/issue/skip
 - [ ] Severity inferred from description (never asked)
-- [ ] Batched writes: on issue, every 5 passes, or completion
+- [ ] File updated after each response
+- [ ] Can resume perfectly from any /clear
 - [ ] Committed on completion
-- [ ] Clear next steps based on results (plan-phase --gaps if issues)
+- [ ] Clear next steps based on results
 </success_criteria>

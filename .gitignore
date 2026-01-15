@@ -3,8 +3,5 @@ package-lock.json
 .DS_Store
 TO-DOS.md
 CLAUDE.md
-.planning
+# .planning - tracked in this repo since we're developing GSD itself
 /research.claude/
-
-# Local test installs
-.claude/

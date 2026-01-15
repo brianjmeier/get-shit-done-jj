@@ -261,12 +261,11 @@ Does this capture what you're building? (yes / adjust)
 If "adjust": Return to scope_categories or identify_gaps as appropriate.
 </step>
 
-<step name="git_commit">
+<step name="jj_commit">
 Commit requirements:
 
 ```bash
-git add .planning/REQUIREMENTS.md
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs: define v1 requirements
 
 [X] requirements across [N] categories.

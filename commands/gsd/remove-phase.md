@@ -13,7 +13,7 @@ allowed-tools:
 Remove an unstarted future phase from the roadmap and renumber all subsequent phases to maintain a clean, linear sequence.
 
 Purpose: Clean removal of work you've decided not to do, without polluting context with cancelled/deferred markers.
-Output: Phase deleted, all subsequent phases renumbered, git commit as historical record.
+Output: Phase deleted, all subsequent phases renumbered, JJ commit as historical record.
 </objective>
 
 <execution_context>
@@ -231,7 +231,7 @@ Update STATE.md:
 2. **Recalculate progress percentage:**
    - New percentage based on completed plans / new total plans
 
-Do NOT add a "Roadmap Evolution" note - the git commit is the record.
+Do NOT add a "Roadmap Evolution" note - the JJ commit is the record.
 
 Write updated STATE.md.
 </step>
@@ -250,11 +250,10 @@ Update any internal references to reflect new numbering.
 </step>
 
 <step name="commit">
-Stage and commit the removal:
+Commit the removal:
 
 ```bash
-git add .planning/
-git commit -m "chore: remove phase {target} ({original-phase-name})"
+jj commit -m "chore: remove phase {target} ({original-phase-name})"
 ```
 
 The commit message preserves the historical record of what was removed.
@@ -295,7 +294,7 @@ Would you like to:
 - Don't remove completed phases (have SUMMARY.md files)
 - Don't remove current or past phases
 - Don't leave gaps in numbering - always renumber
-- Don't add "removed phase" notes to STATE.md - git commit is the record
+- Don't add "removed phase" notes to STATE.md - JJ commit is the record
 - Don't ask about each decimal phase - just renumber them
 - Don't modify completed phase directories
 </anti_patterns>

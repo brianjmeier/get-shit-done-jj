@@ -38,14 +38,14 @@ Creates `.planning/` with PROJECT.md and config.json.
    [ -f .planning/PROJECT.md ] && echo "ERROR: Project already initialized. Use /gsd:progress" && exit 1
    ```
 
-2. **Initialize git repo in THIS directory** (required even if inside a parent repo):
+2. **Initialize JJ repo in THIS directory** (required even if inside a parent repo):
    ```bash
-   # Check if THIS directory is already a git repo root (handles .git file for worktrees too)
-   if [ -d .git ] || [ -f .git ]; then
-       echo "Git repo exists in current directory"
+   # Check if THIS directory is already a JJ repo root
+   if [ -d .jj ]; then
+       echo "JJ repo exists in current directory"
    else
-       git init
-       echo "Initialized new git repo"
+       jj git init --colocate
+       echo "Initialized new JJ colocated repo"
    fi
    ```
 
@@ -270,8 +270,7 @@ Create `.planning/config.json` with chosen mode, depth, and parallelization usin
 <step name="commit">
 
 ```bash
-git add .planning/PROJECT.md .planning/config.json
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs: initialize [project-name]
 
 [One-liner from PROJECT.md]

@@ -162,6 +162,14 @@ cat > .planning/MILESTONE-CONTEXT.md << 'EOF'
 
 </scope>
 
+<phase_mapping>
+## Phase Mapping
+
+- Phase [N]: [Feature/goal]
+- Phase [N+1]: [Feature/goal]
+- Phase [N+2]: [Feature/goal]
+
+</phase_mapping>
 
 <constraints>
 ## Constraints
@@ -196,6 +204,7 @@ Milestone scope defined:
 - [Feature 3]: [description]
 
 **Suggested milestone:** v[X.Y] [Theme Name]
+**Estimated phases:** [N]
 
 Context saved to `.planning/MILESTONE-CONTEXT.md`
 
@@ -217,11 +226,11 @@ Context saved to `.planning/MILESTONE-CONTEXT.md`
 
 <success_criteria>
 
-- Project state loaded (STATE.md, MILESTONES.md)
+- Project state loaded (STATE.md, ROADMAP.md)
 - Previous milestone context presented
 - **Features identified** - What to build/add/fix (the substance)
 - Features explored with clarifying questions
 - Scope synthesized from features (not asked abstractly)
-- **MILESTONE-CONTEXT.md created** with features and scope
+- **MILESTONE-CONTEXT.md created** with features, scope, and phase mapping
 - Context handed off to /gsd:new-milestone
 </success_criteria>

@@ -205,7 +205,7 @@ No segmentation benefit - execute entirely in main
 ```
 1. Run init_agent_tracking step first (see step below)
 
-2. Use Task tool with subagent_type="gsd-executor":
+2. Use Task tool with subagent_type="general-purpose":
 
    Prompt: "Execute plan at .planning/phases/{phase}-{plan}-PLAN.md
 
@@ -357,7 +357,7 @@ For Pattern A (fully autonomous) and Pattern C (decision-dependent), skip this s
 
    B. If routing = Subagent:
       ```
-      Spawn Task tool with subagent_type="gsd-executor":
+      Spawn Task tool with subagent_type="general-purpose":
 
       Prompt: "Execute tasks [task numbers/names] from plan at [plan path].
 
@@ -466,21 +466,12 @@ Execution:
 [1] Spawning subagent for tasks 1-3...
 → Subagent completes: 3 files modified, 0 deviations
 [2] Executing checkpoint 4 (human-verify)...
-╔═══════════════════════════════════════════════════════╗
-║  CHECKPOINT: Verification Required                    ║
-╚═══════════════════════════════════════════════════════╝
-
-Progress: 3/8 tasks complete
-Task: Verify database schema
-
-Built: User and Session tables with relations
-
-How to verify:
-  1. Check src/db/schema.ts for correct types
-
-────────────────────────────────────────────────────────
-→ YOUR ACTION: Type "approved" or describe issues
-────────────────────────────────────────────────────────
+════════════════════════════════════════
+CHECKPOINT: Verification Required
+Task 4 of 8: Verify database schema
+I built: User and Session tables with relations
+How to verify: Check src/db/schema.ts for correct types
+════════════════════════════════════════
 User: "approved"
 [3] Spawning subagent for tasks 5-6...
 → Subagent completes: 2 files modified, 1 deviation (added error handling)
@@ -618,25 +609,23 @@ Error: Not authenticated. Please run 'vercel login'
 
 [Create checkpoint dynamically]
 
-╔═══════════════════════════════════════════════════════╗
-║  CHECKPOINT: Action Required                          ║
-╚═══════════════════════════════════════════════════════╝
+════════════════════════════════════════
+CHECKPOINT: Authentication Required
+════════════════════════════════════════
 
-Progress: 2/8 tasks complete
-Task: Authenticate Vercel CLI
+Task 3 of 8: Authenticate Vercel CLI
 
-Attempted: vercel --yes
-Error: Not authenticated
+I tried to deploy but got authentication error.
 
 What you need to do:
-  1. Run: vercel login
-  2. Complete browser authentication
+Run: vercel login
 
-I'll verify: vercel whoami returns your account
+This will open your browser - complete the authentication flow.
 
-────────────────────────────────────────────────────────
-→ YOUR ACTION: Type "done" when authenticated
-────────────────────────────────────────────────────────
+I'll verify after: vercel whoami returns your account
+
+Type "done" when authenticated
+════════════════════════════════════════
 
 [Wait for user response]
 
@@ -962,18 +951,12 @@ After each task completes (verification passed, done criteria met), commit immed
 Track files changed during this specific task (not the entire plan):
 
 ```bash
-git status --short
+jj status
 ```
 
-**2. Stage only task-related files:**
+**2. Files automatically tracked:**
 
-Stage each file individually (NEVER use `git add .` or `git add -A`):
-
-```bash
-# Example - adjust to actual files modified by this task
-git add src/api/auth.ts
-git add src/types/user.ts
-```
+JJ automatically tracks all changes in the working copy. No staging needed.
 
 **3. Determine commit type:**
 
@@ -993,7 +976,7 @@ git add src/types/user.ts
 Format: `{type}({phase}-{plan}): {task-name-or-description}`
 
 ```bash
-git commit -m "{type}({phase}-{plan}): {concise task description}
+jj commit -m "{type}({phase}-{plan}): {concise task description}
 
 - {key change 1}
 - {key change 2}
@@ -1005,7 +988,7 @@ git commit -m "{type}({phase}-{plan}): {concise task description}
 
 ```bash
 # Standard plan task
-git commit -m "feat(08-02): create user registration endpoint
+jj commit -m "feat(08-02): create user registration endpoint
 
 - POST /auth/register validates email and password
 - Checks for duplicate users
@@ -1013,7 +996,7 @@ git commit -m "feat(08-02): create user registration endpoint
 "
 
 # Another standard task
-git commit -m "fix(08-02): correct email validation regex
+jj commit -m "fix(08-02): correct email validation regex
 
 - Fixed regex to accept plus-addressing
 - Added tests for edge cases
@@ -1027,7 +1010,7 @@ git commit -m "fix(08-02): correct email validation regex
 After committing, capture hash for SUMMARY.md:
 
 ```bash
-TASK_COMMIT=$(git rev-parse --short HEAD)
+TASK_COMMIT=$(jj log -r @ -T 'commit_id.short()' --no-graph)
 echo "Task ${TASK_NUM} committed: ${TASK_COMMIT}"
 ```
 
@@ -1037,9 +1020,9 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 ```
 
 **Atomic commit benefits:**
-- Each task independently revertable
-- Git bisect finds exact failing task
-- Git blame traces line to specific task context
+- Each task independently revertable with `jj revert -r <change-id>`
+- Change IDs provide stable references across rebases
+- `jj log` traces line to specific task context
 - Clear history for Claude in future sessions
 - Better observability for AI-automated workflow
 
@@ -1053,33 +1036,29 @@ When encountering `type="checkpoint:*"`:
 **Display checkpoint clearly:**
 
 ```
-╔═══════════════════════════════════════════════════════╗
-║  CHECKPOINT: [Type]                                   ║
-╚═══════════════════════════════════════════════════════╝
+════════════════════════════════════════
+CHECKPOINT: [Type]
+════════════════════════════════════════
 
-Progress: {X}/{Y} tasks complete
-Task: [task name]
+Task [X] of [Y]: [Action/What-Built/Decision]
 
 [Display task-specific content based on type]
 
-────────────────────────────────────────────────────────
-→ YOUR ACTION: [Resume signal instruction]
-────────────────────────────────────────────────────────
+[Resume signal instruction]
+════════════════════════════════════════
 ```
 
 **For checkpoint:human-verify (90% of checkpoints):**
 
 ```
-Built: [what was automated - deployed, built, configured]
+I automated: [what was automated - deployed, built, configured]
 
 How to verify:
-  1. [Step 1 - exact command/URL]
-  2. [Step 2 - what to check]
-  3. [Step 3 - expected behavior]
+1. [Step 1 - exact command/URL]
+2. [Step 2 - what to check]
+3. [Step 3 - expected behavior]
 
-────────────────────────────────────────────────────────
-→ YOUR ACTION: Type "approved" or describe issues
-────────────────────────────────────────────────────────
+[Resume signal - e.g., "Type 'approved' or describe issues"]
 ```
 
 **For checkpoint:decision (9% of checkpoints):**
@@ -1133,6 +1112,9 @@ See ~/.claude/get-shit-done/references/checkpoints.md for complete checkpoint gu
 If you were spawned via Task tool and hit a checkpoint, you cannot directly interact with the user. Instead, RETURN to the orchestrator with structured checkpoint state so it can present to the user and spawn a fresh continuation agent.
 
 **Return format for checkpoints:**
+
+Use the structured format from:
+@~/.claude/get-shit-done/templates/checkpoint-return.md
 
 **Required in your return:**
 
@@ -1511,30 +1493,19 @@ Commit execution metadata (SUMMARY + STATE + ROADMAP):
 **Note:** All task code has already been committed during execution (one commit per task).
 PLAN.md was already committed during plan-phase. This final commit captures execution results only.
 
-**1. Stage execution artifacts:**
+**1. Verify changes:**
 
 ```bash
-git add .planning/phases/XX-name/{phase}-{plan}-SUMMARY.md
-git add .planning/STATE.md
-```
-
-**2. Stage roadmap:**
-
-```bash
-git add .planning/ROADMAP.md
-```
-
-**3. Verify staging:**
-
-```bash
-git status
+jj status
 # Should show only execution artifacts (SUMMARY, STATE, ROADMAP), no code files
 ```
 
-**4. Commit metadata:**
+**2. Commit metadata:**
+
+JJ automatically tracks all changes. No staging needed.
 
 ```bash
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs({phase}-{plan}): complete [plan-name] plan
 
 Tasks completed: [N]/[N]
@@ -1550,7 +1521,7 @@ EOF
 **Example:**
 
 ```bash
-git commit -m "$(cat <<'EOF'
+jj commit -m "$(cat <<'EOF'
 docs(08-02): complete user registration plan
 
 Tasks completed: 3/3
@@ -1563,7 +1534,7 @@ EOF
 )"
 ```
 
-**Git log after plan execution:**
+**JJ log after plan execution:**
 
 ```
 abc123f docs(08-02): complete user registration plan
@@ -1574,7 +1545,7 @@ lmn012o feat(08-02): create user registration endpoint
 
 Each task has its own commit, followed by one metadata commit documenting plan completion.
 
-For commit message conventions, see ~/.claude/get-shit-done/references/git-integration.md
+For commit message conventions, see ~/.claude/get-shit-done/references/jj-integration.md
 </step>
 
 <step name="update_codebase_map">
@@ -1584,10 +1555,10 @@ Check what changed across all task commits in this plan:
 
 ```bash
 # Find first task commit (right after previous plan's docs commit)
-FIRST_TASK=$(git log --oneline --grep="feat({phase}-{plan}):" --grep="fix({phase}-{plan}):" --grep="test({phase}-{plan}):" --reverse | head -1 | cut -d' ' -f1)
+FIRST_TASK=$(jj log --no-graph -r 'description(glob:"*({phase}-{plan}):*") & ~description(glob:"docs({phase}-{plan}):*")' -T 'commit_id.short()' | tail -1)
 
 # Get all changes from first task through now
-git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null
+jj diff --summary -r ${FIRST_TASK}::@ 2>/dev/null
 ```
 
 **Update only if structural changes occurred:**
@@ -1610,8 +1581,7 @@ git diff --name-only ${FIRST_TASK}^..HEAD 2>/dev/null
 Make single targeted edits - add a bullet point, update a path, or remove a stale entry. Don't rewrite sections.
 
 ```bash
-git add .planning/codebase/*.md
-git commit --amend --no-edit  # Include in metadata commit
+jj squash  # Merge codebase map changes into previous commit
 ```
 
 **If .planning/codebase/ doesn't exist:**
@@ -1791,9 +1761,10 @@ Summary: .planning/phases/{phase-dir}/{phase}-{plan}-SUMMARY.md
 
 All {Y} plans finished.
 
-╔═══════════════════════════════════════════════════════╗
-║  All {N} phases complete! Milestone is 100% done.     ║
-╚═══════════════════════════════════════════════════════╝
+════════════════════════════════════════
+All {N} phases complete!
+Milestone is 100% done.
+════════════════════════════════════════
 
 ---
 

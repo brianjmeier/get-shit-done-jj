@@ -1,31 +1,31 @@
 {
-  "name": "get-shit-done-cc",
-  "version": "1.5.15",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.",
+  "name": "gsd-jj",
+  "version": "1.0.0",
+  "description": "GSD (Get Shit Done) context engineering framework with JJ (Jujutsu) VCS - supports Claude Code and OpenCode",
   "bin": {
-    "get-shit-done-cc": "bin/install.js"
+    "gsd-jj": "bin/install.js"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=16.7.0"
   },
   "files": [
     "bin",
     "commands",
-    "get-shit-done",
-    "agents"
+    "adapters",
+    "get-shit-done"
   ],
   "keywords": [
-    "claude",
+    "gsd",
+    "jujutsu",
+    "jj",
     "claude-code",
-    "ai",
-    "meta-prompting",
-    "context-engineering",
-    "spec-driven-development"
+    "opencode",
+    "context-engineering"
   ],
-  "author": "TÂCHES",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/glittercowboy/get-shit-done.git"
-  },
-  "engines": {
-    "node": ">=16.7.0"
+    "url": "https://github.com/OWNER/gsd-jj.git"
   }
 }

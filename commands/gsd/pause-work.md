@@ -91,8 +91,10 @@ Be specific enough for a fresh Claude to understand immediately.
 
 <step name="commit">
 ```bash
-git add .planning/phases/*/.continue-here.md
-git commit -m "wip: [phase-name] paused at task [X]/[Y]"
+jj commit -m "wip: [phase-name] paused at task [X]/[Y]
+
+Current: [task name]
+"
 ```
 </step>
 
