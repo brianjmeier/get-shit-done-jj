@@ -12,7 +12,7 @@
 <br>
 
 ```bash
-npx gsd-jj
+npx github:brianjmeier/get-shit-done-jj
 ```
 
 **Interactive installer for Claude Code and OpenCode.**
@@ -100,12 +100,6 @@ See [Architecture](#architecture) section for details.
 ### Interactive Install (Recommended)
 
 ```bash
-npx gsd-jj
-```
-
-Or install directly from GitHub (if npm package unavailable):
-
-```bash
 npx github:brianjmeier/get-shit-done-jj
 ```
 
@@ -120,16 +114,16 @@ For Docker, CI, or scripted installations:
 
 ```bash
 # Claude Code - Global
-npx gsd-jj --claude-code --global
+npx github:brianjmeier/get-shit-done-jj --claude-code --global
 
 # Claude Code - Local
-npx gsd-jj --claude-code --local
+npx github:brianjmeier/get-shit-done-jj --claude-code --local
 
 # OpenCode - Global
-npx gsd-jj --opencode --global
+npx github:brianjmeier/get-shit-done-jj --opencode --global
 
 # OpenCode - Local
-npx gsd-jj --opencode --local
+npx github:brianjmeier/get-shit-done-jj --opencode --local
 ```
 
 **Verify installation:**
@@ -423,12 +417,12 @@ Key points:
 
 **Want to update?**
 ```bash
-npx gsd-jj@latest
+npx github:brianjmeier/get-shit-done-jj
 ```
 
 **Using Docker or containers?**
 ```bash
-CLAUDE_CONFIG_DIR=/home/user/.claude npx gsd-jj --claude-code --global
+CLAUDE_CONFIG_DIR=/home/user/.claude npx github:brianjmeier/get-shit-done-jj --claude-code --global
 ```
 
 ---
