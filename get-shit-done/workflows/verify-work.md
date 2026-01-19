@@ -287,8 +287,8 @@ Clear Current Test section:
 
 Commit the UAT file:
 ```bash
-git add ".planning/phases/XX-name/{phase}-UAT.md"
-git commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
+# JJ auto-tracks all changes
+jj commit -m "test({phase}): complete UAT - {passed} passed, {issues} issues"
 ```
 
 Present summary:

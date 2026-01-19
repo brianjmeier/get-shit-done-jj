@@ -390,12 +390,12 @@ Created: .planning/phases/${PADDED_PHASE}-${SLUG}/${PADDED_PHASE}-CONTEXT.md
 ```
 </step>
 
-<step name="git_commit">
+<step name="jj_commit">
 Commit phase context:
 
 ```bash
-git add "${PHASE_DIR}/${PADDED_PHASE}-CONTEXT.md"
-git commit -m "$(cat <<'EOF'
+# JJ auto-tracks all changes
+jj commit -m "$(cat <<'EOF'
 docs(${PADDED_PHASE}): capture phase context
 
 Phase ${PADDED_PHASE}: ${PHASE_NAME}

@@ -212,8 +212,8 @@ Continue to commit_codebase_map.
 Commit the codebase map:
 
 ```bash
-git add .planning/codebase/*.md
-git commit -m "$(cat <<'EOF'
+# JJ auto-tracks all changes
+jj commit -m "$(cat <<'EOF'
 docs: map existing codebase
 
 - STACK.md - Technologies and dependencies

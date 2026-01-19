@@ -128,18 +128,18 @@ Calculate milestone statistics:
 # Count phases and plans in milestone
 # (user specified or detected from roadmap)
 
-# Find git range
-git log --oneline --grep="feat(" | head -20
+# Find change range
+jj log --no-graph -r 'description(glob:"feat(*")' -T 'change_id.short() " " description.first_line() "\n"' | head -20
 
 # Count files modified in range
-git diff --stat FIRST_COMMIT..LAST_COMMIT | tail -1
+jj diff -r FIRST_CHANGE..LAST_CHANGE --summary | wc -l
 
 # Count LOC (adapt to language)
 find . -name "*.swift" -o -name "*.ts" -o -name "*.py" | xargs wc -l 2>/dev/null
 
 # Calculate timeline
-git log --format="%ai" FIRST_COMMIT | tail -1  # Start date
-git log --format="%ai" LAST_COMMIT | head -1   # End date
+jj log -r FIRST_CHANGE -T 'committer.timestamp().local().format("%Y-%m-%d")'  # Start date
+jj log -r LAST_CHANGE -T 'committer.timestamp().local().format("%Y-%m-%d")'   # End date
 ```
 
 Present summary:
@@ -584,24 +584,33 @@ Progress: [updated progress bar]
 
 </step>
 
-<step name="git_tag">
+<step name="jj_tag">
 
-Create git tag for milestone:
+Create bookmark and tag for milestone:
 
 ```bash
-git tag -a v[X.Y] -m "$(cat <<'EOF'
-v[X.Y] [Name]
+# First commit the milestone completion
+jj commit -m "$(cat <<'EOF'
+chore: complete v[X.Y] milestone
 
-Delivered: [One sentence]
+Archived:
+- milestones/v[X.Y]-ROADMAP.md
+- milestones/v[X.Y]-REQUIREMENTS.md
+- milestones/v[X.Y]-MILESTONE-AUDIT.md (if audit was run)
 
-Key accomplishments:
-- [Item 1]
-- [Item 2]
-- [Item 3]
+Deleted (fresh for next milestone):
+- ROADMAP.md
+- REQUIREMENTS.md
 
-See .planning/MILESTONES.md for full details.
+Updated:
+- MILESTONES.md (new entry)
+- PROJECT.md (requirements → Validated)
+- STATE.md (reset for next milestone)
 EOF
 )"
+
+# Create tag (JJ uses git tags in colocated repos)
+jj bookmark create v[X.Y] -r @-
 ```
 
 Confirm: "Tagged: v[X.Y]"
@@ -611,31 +620,30 @@ Ask: "Push tag to remote? (y/n)"
 If yes:
 
 ```bash
-git push origin v[X.Y]
+jj git push --bookmark v[X.Y] --allow-new
 ```
 
 </step>
 
-<step name="git_commit_milestone">
+<step name="jj_commit_milestone">
 
-Commit milestone completion including archive files and deletions.
+JJ auto-tracks all file changes. No staging needed.
 
 ```bash
-# Stage archive files (new)
-git add .planning/milestones/v[X.Y]-ROADMAP.md
-git add .planning/milestones/v[X.Y]-REQUIREMENTS.md
-git add .planning/milestones/v[X.Y]-MILESTONE-AUDIT.md 2>/dev/null || true
+# Verify changes
+jj status
 
-# Stage updated files
-git add .planning/MILESTONES.md
-git add .planning/PROJECT.md
-git add .planning/STATE.md
+# Should show:
+# - Archive files (new): milestones/v[X.Y]-*.md
+# - Updated files: MILESTONES.md, PROJECT.md, STATE.md
+# - Deleted files: ROADMAP.md, REQUIREMENTS.md
 
-# Stage deletions
-git add -u .planning/
+# Commit was already done in previous step with tag
+# If additional changes needed:
+jj squash  # Squash into previous commit
 
-# Commit with descriptive message
-git commit -m "$(cat <<'EOF'
+# Or describe current working copy if not yet committed:
+jj describe -m "$(cat <<'EOF'
 chore: complete v[X.Y] milestone
 
 Archived:
