@@ -28,5 +28,17 @@
   },
   "engines": {
     "node": ">=16.7.0"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "bugs": {
+    "url": "https://github.com/glittercowboy/get-shit-done/issues"
+  },
+  "homepage": "https://github.com/glittercowboy/get-shit-done#readme",
+  "devDependencies": {
+    "vitest": "^4.0.17"
   }
 }
