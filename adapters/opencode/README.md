@@ -18,10 +18,25 @@ The slash commands reference shared workflows, templates, and references. Instal
 
 ```bash
 mkdir -p ~/.config/opencode/get-shit-done
-cp -r workflows ~/.config/opencode/get-shit-done/
-cp -r templates ~/.config/opencode/get-shit-done/
-cp -r references ~/.config/opencode/get-shit-done/
+cp -r get-shit-done/workflows ~/.config/opencode/get-shit-done/
+cp -r get-shit-done/templates ~/.config/opencode/get-shit-done/
+cp -r get-shit-done/references ~/.config/opencode/get-shit-done/
 ```
+
+### 3. Install OpenCode-Specific Templates (Critical!)
+
+Some templates contain `@` file references that must point to OpenCode paths. Copy the OpenCode-specific templates to overwrite the generic ones:
+
+```bash
+cp -r adapters/opencode/templates/* ~/.config/opencode/get-shit-done/templates/
+```
+
+**Why this matters:** The generic templates reference `~/.claude/get-shit-done/...` paths which don't exist in OpenCode installations. The OpenCode-specific templates use `~/.config/opencode/get-shit-done/...` paths instead.
+
+Templates overwritten:
+- `subagent-task-prompt.md` - Used when spawning plan execution agents
+- `continuation-prompt.md` - Used when resuming after checkpoints
+- `phase-prompt.md` - Template for creating PLAN.md files
 
 ## Usage
 
@@ -55,8 +70,9 @@ To update your OpenCode installation after pulling changes:
 # Update commands
 cp -r adapters/opencode/command/gsd ~/.config/opencode/command/
 
-# Update shared core
-cp -r workflows ~/.config/opencode/get-shit-done/
-cp -r templates ~/.config/opencode/get-shit-done/
-cp -r references ~/.config/opencode/get-shit-done/
+# Update shared core (templates first, then overwrite with OpenCode-specific)
+cp -r get-shit-done/workflows ~/.config/opencode/get-shit-done/
+cp -r get-shit-done/templates ~/.config/opencode/get-shit-done/
+cp -r get-shit-done/references ~/.config/opencode/get-shit-done/
+cp -r adapters/opencode/templates/* ~/.config/opencode/get-shit-done/templates/
 ```

@@ -327,10 +327,10 @@ Continue handling returns until "## PLAN COMPLETE" or user stops.
 </checkpoint_handling>
 
 <checkpoint_templates>
-Templates for checkpoint handling:
+Templates for checkpoint handling (OpenCode-specific versions):
 
 - `@~/.config/opencode/get-shit-done/templates/checkpoint-return.md` - Subagent return format
-- `@~/.config/opencode/get-shit-done/templates/continuation-prompt.md` - Fresh agent spawn template
+- `@~/.config/opencode/get-shit-done/templates/continuation-prompt.md` - Fresh agent spawn template (OpenCode paths)
 </checkpoint_templates>
 
 <success_criteria>
