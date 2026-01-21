@@ -60,6 +60,7 @@ if (args.help) {
 
   ${yellow}Other:${reset}
     ${cyan}-h, --help${reset}                Show this help message
+    ${cyan}--force-statusline${reset}        Replace existing statusline config
 
   ${yellow}Examples:${reset}
     ${dim}# Auto-detect platform, install globally${reset}
@@ -94,6 +95,7 @@ function runInstall(platform, isGlobal) {
   const result = installer.install(platform, isGlobal, {
     srcDir: path.join(__dirname, '..'),
     configDir: args.configDir,
+    forceStatusline: args.forceStatusline,
   });
   
   if (!result.success) {

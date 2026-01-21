@@ -1,44 +1,53 @@
 {
-  "name": "get-shit-done-cc",
-  "version": "1.6.4",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.",
+  "name": "get-shit-done-jj",
+  "version": "1.9.4",
+  "description": "A JJ-first fork of get-shit-done - meta-prompting, context engineering and spec-driven development system.",
   "bin": {
-    "get-shit-done-cc": "bin/install.js"
+    "get-shit-done-jj": "bin/install.js"
   },
   "files": [
     "bin",
+    "lib",
     "commands",
     "get-shit-done",
     "agents",
-    "hooks"
+    "hooks/dist",
+    "scripts"
   ],
   "keywords": [
     "claude",
     "claude-code",
+    "opencode",
+    "jujutsu",
+    "jj",
     "ai",
     "meta-prompting",
     "context-engineering",
     "spec-driven-development"
   ],
-  "author": "TÂCHES",
+  "author": "TÂCHES (upstream), Brian Meier (JJ fork)",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/glittercowboy/get-shit-done.git"
+    "url": "git+https://github.com/brianjmeier/get-shit-done-jj.git"
+  },
+  "homepage": "https://github.com/brianjmeier/get-shit-done-jj",
+  "bugs": {
+    "url": "https://github.com/brianjmeier/get-shit-done-jj/issues"
   },
   "engines": {
     "node": ">=16.7.0"
   },
   "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "vitest": "^4.0.17"
+  },
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "bugs": {
-    "url": "https://github.com/glittercowboy/get-shit-done/issues"
-  },
-  "homepage": "https://github.com/glittercowboy/get-shit-done#readme",
-  "devDependencies": {
-    "vitest": "^4.0.17"
+    "test:watch": "vitest",
+    "build:hooks": "node scripts/build-hooks.js",
+    "prepublishOnly": "npm run build:hooks"
   }
 }

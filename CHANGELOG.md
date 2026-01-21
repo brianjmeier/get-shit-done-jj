@@ -6,6 +6,71 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.4] - 2026-01-21
+
+### Changed
+- Checkpoint automation now enforces automation-first principle: Claude starts servers, handles CLI installs, and fixes setup failures before presenting checkpoints to users
+- Added server lifecycle protocol (port conflict handling, background process management)
+- Added CLI auto-installation handling with safe-to-install matrix
+- Added pre-checkpoint failure recovery (fix broken environment before asking user to verify)
+- DRY refactor: checkpoints.md is now single source of truth for automation patterns
+
+## [1.9.2] - 2025-01-21
+
+### Removed
+- **Codebase Intelligence System** — Removed due to overengineering concerns
+  - Deleted `/gsd:analyze-codebase` command
+  - Deleted `/gsd:query-intel` command
+  - Removed SQLite graph database and sql.js dependency (21MB)
+  - Removed intel hooks (gsd-intel-index.js, gsd-intel-session.js, gsd-intel-prune.js)
+  - Removed entity file generation and templates
+
+### Fixed
+- new-project now properly includes model_profile in config
+
+## [1.9.0] - 2025-01-20
+
+### Added
+- **Model Profiles** — `/gsd:set-profile` for quality/balanced/budget agent configurations
+- **Workflow Settings** — `/gsd:settings` command for toggling workflow behaviors interactively
+
+### Fixed
+- Orchestrators now inline file contents in Task prompts (fixes context issues with @ references)
+- Tech debt from milestone audit addressed
+- All hooks now use `gsd-` prefix for consistency (statusline.js → gsd-statusline.js)
+
+## [1.8.0] - 2026-01-19
+
+### Added
+- Uncommitted planning mode: Keep `.planning/` local-only (not committed to git) via `planning.commit_docs: false` in config.json. Useful for OSS contributions, client work, or privacy preferences.
+- `/gsd:new-project` now asks about git tracking during initial setup, letting you opt out of committing planning docs from the start
+
+## [1.7.1] - 2026-01-19
+
+### Fixed
+- Quick task PLAN and SUMMARY files now use numbered prefix (`001-PLAN.md`, `001-SUMMARY.md`) matching regular phase naming convention
+
+## [1.7.0] - 2026-01-19
+
+### Added
+- **Quick Mode** (`/gsd:quick`) — Execute small, ad-hoc tasks with GSD guarantees but skip optional agents (researcher, checker, verifier). Quick tasks live in `.planning/quick/` with their own tracking in STATE.md.
+
+### Changed
+- Improved progress bar calculation to clamp values within 0-100 range
+- Updated documentation with comprehensive Quick Mode sections in help.md, README.md, and GSD-STYLE.md
+
+### Fixed
+- Console window flash on Windows when running hooks
+- Empty `--config-dir` value validation
+- Consistent `allowed-tools` YAML format across agents
+- Corrected agent name in research-phase heading
+- Removed hardcoded 2025 year from search query examples
+- Removed dead gsd-researcher agent references
+- Integrated unused reference files into documentation
+
+### Housekeeping
+- Added homepage and bugs fields to package.json
+
 ## [1.6.4] - 2026-01-17
 
 ### Fixed
@@ -925,7 +990,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.6.4...HEAD
+[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.9.4...HEAD
+[1.9.4]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.9.4
+[1.9.2]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.9.2
+[1.9.0]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.9.0
+[1.8.0]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.8.0
+[1.7.1]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.7.1
+[1.7.0]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.7.0
 [1.6.4]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.4
 [1.6.3]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.3
 [1.6.2]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.2
